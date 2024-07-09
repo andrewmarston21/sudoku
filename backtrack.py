@@ -108,3 +108,5 @@ def print_board(board: list[list[int]]):
         if i == 2 or i == 5:
             board_rep += "---------------------\n"
     print(board_rep)
+
+# Test change
