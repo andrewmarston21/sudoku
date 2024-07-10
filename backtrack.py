@@ -26,6 +26,8 @@ def backtrack_solver(board: list[list[int]], square: int=0, verbose=False) -> li
         # build a new board with this potential value
         new_board: list[list[int]] = list(board)
         new_board[square] = [value]
+        if not _forward_check(new_board, square, value): # here's the forward checking!
+            continue
         if verbose: print_board(new_board)
 
         # Pass that new board to backtrack_solver to check the next square
@@ -46,6 +48,16 @@ def _is_consistent(board: list[list[int]], square: int, value: int) -> bool:
     """Checks if the given board follows the rules of Sudoku, and returns whether it is or not"""
     for loc in _get_neighbors(square):
         if len(board[loc]) == 1 and board[loc][0] == value and (loc != square):
+            return False
+    return True
+
+def _forward_check(board: list[list[int]], square: int, value: int) -> bool:
+    """Goes through all neighbors of square and eliminates value from their domains. If any domain becomes empty, then this value assignment won't work"""
+    for neighbor in _get_neighbors(square):
+        if neighbor == square: # a side effect of not removing the square itself from its list of neighbors
+            continue
+        if value in board[neighbor]: board[neighbor].remove(value)
+        if len(board[neighbor]) == 0:
             return False
     return True
 
