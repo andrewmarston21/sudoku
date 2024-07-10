@@ -4,7 +4,7 @@ def backtrack_solver(board: list[list[int]], square: int=0, verbose=False) -> li
       returns a solved board using basic backtracking search or None if every value in square's domain has been tried"""
 
     # If square=81, return the board
-    if verbose: print("backtrack_solver is running")
+    if verbose: print(f"backtrack_solver is running on square number {square}")
     if square == 81:
         return board
 
@@ -15,6 +15,8 @@ def backtrack_solver(board: list[list[int]], square: int=0, verbose=False) -> li
         if type(result) == list[list[int]]:
             return result
     
+    if verbose: print(board[square]) # print square's domain
+
     # Pick the first available value in square's domain
     for value in board[square]:
         if verbose: print("Trying value " + str(value))
@@ -38,7 +40,8 @@ def backtrack_solver(board: list[list[int]], square: int=0, verbose=False) -> li
             return result
         
         # Else the recursive call returns None, try the next value in square's domain.
-        if verbose: print("Backtracking!")
+        if verbose: print(f"Backtracking to square number {square - 1}") #TODO: backtracking to square number -1??
+        if verbose: print_board(board)
 
     # If all values of square's domain have been tried, return None
     return None
@@ -54,11 +57,22 @@ def _is_consistent(board: list[list[int]], square: int, value: int) -> bool:
 def _forward_check(board: list[list[int]], square: int, value: int) -> bool:
     """Goes through all neighbors of square and eliminates value from their domains. If any domain becomes empty, then this value assignment won't work"""
     for neighbor in _get_neighbors(square):
-        if neighbor == square: # a side effect of not removing the square itself from its list of neighbors
+
+        # Keeps the algorithm from immediately failing
+        if neighbor == square:
             continue
         if value in board[neighbor]: board[neighbor].remove(value)
+
+        # if the domain of any square is reduced to one value, make sure that one value is consistent
+        if len(board[neighbor]) == 1:
+            if not _is_consistent(board, neighbor, board[neighbor][0]):
+                return False
+    
+        # If the domain of any square is empty, then this value assignment cannot work
         if len(board[neighbor]) == 0:
             return False
+    
+    # If all checks pass, then this value might work
     return True
 
 def _get_neighbors(square: int) -> list[int]:
