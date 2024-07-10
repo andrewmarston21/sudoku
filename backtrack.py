@@ -2,29 +2,39 @@ def backtrack_solver(board: list[list[int]], square: int=0, verbose=False) -> li
     """Accepts a representation of a given Sudoku board in memory (a list with indicies 0 to 80 of the possible values of each of the squares)
       and the current square being solved;
       returns a solved board using basic backtracking search or None if every value in square's domain has been tried"""
+
     # If square=81, return the board
     if verbose: print("backtrack_solver is running")
     if square == 81:
         return board
+
+    # If the square already has a value, don't try to change it
     if len(board[square]) == 1:
         result = backtrack_solver(board, square+1, verbose)
+        # If the result is a board, keep passing it back down the stack
         if type(result) == list[list[int]]:
             return result
+    
     # Pick the first available value in square's domain
     for value in board[square]:
         if verbose: print("Trying value " + str(value))
+
         # Check the neighbors of square to make sure this assignment is consistent, if it is not, try the next avialable value in the domain
         if not _is_consistent(board, square, value):
             continue
+
         # build a new board with this potential value
         new_board: list[list[int]] = list(board)
         new_board[square] = [value]
         if verbose: print_board(new_board)
+
         # Pass that new board to backtrack_solver to check the next square
         result = backtrack_solver(new_board, square+1, verbose)
+
         # If the recursive call returns a board, return that board
         if type(result) == list[list[int]]:
             return result
+        
         # Else the recursive call returns None, try the next value in square's domain.
         if verbose: print("Backtracking!")
 
@@ -108,5 +118,3 @@ def print_board(board: list[list[int]]):
         if i == 2 or i == 5:
             board_rep += "---------------------\n"
     print(board_rep)
-
-# Test change
