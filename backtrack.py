@@ -11,11 +11,16 @@ def backtrack_solver(board: list[list[int]], square: int=0, verbose=False) -> li
     # If the square already has a value, don't try to change it
     if len(board[square]) == 1:
         if verbose: print("    This square is already solved")
-        result = backtrack_solver(board, square+1, verbose)
+        new_board = list(board)
+        result = backtrack_solver(new_board, square+1, verbose)
 
         # If the result is a board, keep passing it back down the stack
         if type(result) == list[list[int]]:
             return result
+        # If the result is a None, then back up
+        else:
+            if verbose: print(f"Backtracking to square number {square - 1}")
+            return None
     
     if verbose: print(board[square]) # print square's domain
 
@@ -47,10 +52,9 @@ def backtrack_solver(board: list[list[int]], square: int=0, verbose=False) -> li
             return result
         
         # Else the recursive call returns None, try the next value in square's domain.
-        continue
 
     # If all values of square's domain have been tried, return None
-    if verbose: print(f"Backtracking to square number {square - 1}") #TODO: backtracking to square number -1??
+    if verbose: print(f"Backtracking to square number {square - 1}")
     return None
 
 def _is_consistent(board: list[list[int]], square: int, value: int) -> bool:
