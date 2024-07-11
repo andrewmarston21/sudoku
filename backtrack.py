@@ -19,7 +19,7 @@ def backtrack_solver(board: list[list[int]], square: int=0, verbose=False) -> li
             return result
         # If the result is a None, then back up
         else:
-            if verbose: print(f"Backtracking to square number {square - 1}")
+            if verbose: print(f"Backtracking to square number {square - 1}, square {square} is already solved")
             return None
     
     if verbose: print(board[square]) # print square's domain
@@ -39,7 +39,7 @@ def backtrack_solver(board: list[list[int]], square: int=0, verbose=False) -> li
         new_board[square] = [value]
 
         # use forward checking to determine if this value is viable in the longer term
-        if not _forward_check(new_board, square, value):
+        if not _forward_check(new_board, square, value, verbose):
             continue
 
         if verbose: print_board(new_board)
@@ -64,8 +64,9 @@ def _is_consistent(board: list[list[int]], square: int, value: int) -> bool:
             return False
     return True
 
-def _forward_check(board: list[list[int]], square: int, value: int) -> bool:
+def _forward_check(board: list[list[int]], square: int, value: int, verbose: bool) -> bool:
     """Goes through all neighbors of square and eliminates value from their domains. If any domain becomes empty, then this value assignment won't work"""
+    board_copy: list[list[int]] = list(board)
     for neighbor in _get_neighbors(square):
 
         # Keeps the algorithm from immediately failing
@@ -73,15 +74,21 @@ def _forward_check(board: list[list[int]], square: int, value: int) -> bool:
             continue
 
         # if the assigned value is in the domain of any neighbor, remove it ***this is the core of forward checking***
-        if value in board[neighbor]: board[neighbor].remove(value)
+        if value in board[neighbor]:
+            board[neighbor].remove(value)
+            if verbose: print("FWC removed value " + str(value) + " from square number " + str(neighbor) + ". Its remaining domain is " + str(board[neighbor]))
 
         # if the domain of any square is reduced to one value, make sure that one value is consistent
         if len(board[neighbor]) == 1:
             if not _is_consistent(board, neighbor, board[neighbor][0]):
+                board = list(board_copy)
+                if verbose: print("FWC failed because it resulted in an inconsistent board")
                 return False
     
         # If the domain of any square is empty, then this value assignment cannot work
         if len(board[neighbor]) == 0:
+            board = list(board_copy)
+            if verbose: print("FWC failed because the domain of a square was emptied")
             return False
     
     # If all checks pass, then this value might work
