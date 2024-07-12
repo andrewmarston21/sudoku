@@ -8,39 +8,34 @@ def backtrack_solver(board: list[list[int]], square: int=0, verbose=False) -> li
     if square == 81:
         return board
 
-    # If the square already has a value, don't try to change it
-    if len(board[square]) == 1:
-        if verbose: print("    This square is already solved")
-        new_board = list(board)
-        result = backtrack_solver(new_board, square+1, verbose)
+    # # If the square already has a value, don't try to change it
+    # if len(board[square]) == 1:
+    #     if verbose: print("    This square is already solved")
+    #     result = backtrack_solver(board, square+1, verbose)
 
-        # If the result is a board, keep passing it back down the stack
-        if type(result) == list[list[int]]:
-            return result
-        # If the result is a None, then back up
-        else:
-            if verbose: print(f"Backtracking to square number {square - 1}, square {square} is already solved")
-            return None
+    #     # If the result is a board, keep passing it back down the stack
+    #     if type(result) == list[list[int]]:
+    #         return result
     
     if verbose: print(board[square]) # print square's domain
 
     # Pick the first available value in square's domain
     for value in board[square]:
-        if verbose: print("Trying value " + str(value))
-
-        # Check the neighbors of square to make sure this assignment is consistent,
-        # if it is not, try the next avialable value in the domain
-        if not _is_consistent(board, square, value):
-            if verbose: print("    Inconsistent!")
-            continue
-
         # build a new board with this potential value
         new_board: list[list[int]] = list(board)
         new_board[square] = [value]
 
-        # # use forward checking to determine if this value is viable in the longer term
-        # if not _forward_check(new_board, square, value, verbose):
-        #     continue
+        if verbose: print("Trying value " + str(value))
+        if verbose: print_board(new_board)
+
+        # Check the neighbors of square to make sure this assignment is consistent,
+        # if it is not, try the next avialable value in the domain
+        if not _is_consistent(board, square, value):
+            continue
+
+        # use forward checking to determine if this value is viable in the longer term
+        if not _forward_check(new_board, square, value):
+            continue
 
         if verbose: print_board(new_board)
 
@@ -52,21 +47,25 @@ def backtrack_solver(board: list[list[int]], square: int=0, verbose=False) -> li
             return result
         
         # Else the recursive call returns None, try the next value in square's domain.
+        continue
 
     # If all values of square's domain have been tried, return None
     if verbose: print(f"Backtracking to square number {square - 1}")
     return None
 
+
 def _is_consistent(board: list[list[int]], square: int, value: int) -> bool:
     """Checks if the given board follows the rules of Sudoku, and returns whether it is or not"""
     for loc in _get_neighbors(square):
+        #print("Checking the value of square number " + str(loc) + "(" + str(board[loc]) + ")" + " against the value of square number " + str(square) + "(" + str(value) + ")")
         if len(board[loc]) == 1 and board[loc][0] == value and (loc != square):
+            print("There is a " + str(board[loc][0]) + " in square " + str(loc) + " that conflicts with the " + str(value) + " in square " + str(square))
             return False
     return True
 
-def _forward_check(board: list[list[int]], square: int, value: int, verbose: bool) -> bool:
+def _forward_check(board: list[list[int]], square: int, value: int) -> bool:
     """Goes through all neighbors of square and eliminates value from their domains. If any domain becomes empty, then this value assignment won't work"""
-    board_copy: list[list[int]] = list(board)
+    board_copy = list(board)
     for neighbor in _get_neighbors(square):
 
         # Keeps the algorithm from immediately failing
@@ -74,24 +73,19 @@ def _forward_check(board: list[list[int]], square: int, value: int, verbose: boo
             continue
 
         # if the assigned value is in the domain of any neighbor, remove it ***this is the core of forward checking***
-        if value in board[neighbor]:
-            board[neighbor].remove(value)
-            if verbose: print("FWC removed value " + str(value) + " from square number " + str(neighbor) + ". Its remaining domain is " + str(board[neighbor]))
+        if value in board_copy[neighbor]: board_copy[neighbor].remove(value)
 
-        # if the domain of any square is reduced to one value, make sure that one value is consistent
-        if len(board[neighbor]) == 1:
-            if not _is_consistent(board, neighbor, board[neighbor][0]):
-                board = list(board_copy)
-                if verbose: print("FWC failed because it resulted in an inconsistent board")
+        # make sure board is consistent
+        if len(board_copy[neighbor]) == 1:
+            if not _is_consistent(board_copy, neighbor, board_copy[neighbor][0]):
                 return False
     
         # If the domain of any square is empty, then this value assignment cannot work
-        if len(board[neighbor]) == 0:
-            board = list(board_copy)
-            if verbose: print("FWC failed because the domain of a square was emptied")
+        if len(board_copy[neighbor]) == 0:
             return False
     
     # If all checks pass, then this value might work
+    board = list(board_copy)
     return True
 
 def _get_neighbors(square: int) -> list[int]:

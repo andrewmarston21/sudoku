@@ -7,7 +7,6 @@ if __name__ == "__main__":
     """handles inputting a board and outputting a representation of that board solved"""
     path: str = sys.argv[1]
     verbosity = True
-    
     board: list[list[int]] = read_csv(path)
     print("The board to solve:")
     print_board(board)
