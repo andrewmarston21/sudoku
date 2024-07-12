@@ -38,9 +38,9 @@ def backtrack_solver(board: list[list[int]], square: int=0, verbose=False) -> li
         new_board: list[list[int]] = list(board)
         new_board[square] = [value]
 
-        # use forward checking to determine if this value is viable in the longer term
-        if not _forward_check(new_board, square, value, verbose):
-            continue
+        # # use forward checking to determine if this value is viable in the longer term
+        # if not _forward_check(new_board, square, value, verbose):
+        #     continue
 
         if verbose: print_board(new_board)
 
