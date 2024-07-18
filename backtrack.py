@@ -1,7 +1,9 @@
 import copy
 
-def backtrack_solver(board: list[list[int]], square: int=0, verbose=False) -> list[list[int]]:
-    """Accepts a representation of a given Sudoku board in memory (a list with indicies 0 to 80 of the possible values of each of the squares)
+
+def backtrack_solver(board: list[list[int]], square: int=0, verbose=False) -> list[list[int]] | None:
+    """Accepts a representation of a given Sudoku board in memory (a list with indices 0 to 80 of the possible values
+      of each of the squares)
       and the current square being solved;
       returns a solved board using basic backtracking search or None if every value in square's domain has been tried"""
 
@@ -21,7 +23,7 @@ def backtrack_solver(board: list[list[int]], square: int=0, verbose=False) -> li
         if verbose: print_board(new_board)
 
         # Check the neighbors of square to make sure this assignment is consistent,
-        # if it is not, try the next avialable value in the domain
+        # if it is not, try the next available value in the domain
         if not _is_consistent(board, square, value, verbose):
             continue
 
@@ -33,7 +35,7 @@ def backtrack_solver(board: list[list[int]], square: int=0, verbose=False) -> li
         result = backtrack_solver(new_board, square+1, verbose)
 
         # If the recursive call returns a board, return that board
-        if type(result) == list[list[int]]:
+        if type(result) is not None:
             return result
         
         # Else the recursive call returns None, try the next value in square's domain.
@@ -54,8 +56,10 @@ def _is_consistent(board: list[list[int]], square: int, value: int, verbose: boo
             return False
     return True
 
+
 def _forward_check(board: list[list[int]], square: int, value: int) -> bool:
-    """Goes through all neighbors of square and eliminates value from their domains. If any domain becomes empty, then this value assignment won't work"""
+    """Goes through all neighbors of square and eliminates value from their domains.
+       If any domain becomes empty, then this value assignment won't work"""
     board_copy = copy.deepcopy(board)
     for neighbor in _get_neighbors(square):
 
@@ -74,8 +78,9 @@ def _forward_check(board: list[list[int]], square: int, value: int) -> bool:
     board = copy.deepcopy(board_copy) # some fun deliberate side effects that might be causing the failures
     return True
 
+
 def _get_neighbors(square: int) -> list[int]:
-    """Takes the index of a square in a Sudoku board and returns a list of the indicies of the neighbors of that square
+    """Takes the index of a square in a Sudoku board and returns a list of the indices of the neighbors of that square
     (i.e. those squares effected by the value of the given square)"""
     row = _get_row_col_block(square)[0]
     col = _get_row_col_block(square)[1]
@@ -92,7 +97,7 @@ def _get_neighbors(square: int) -> list[int]:
         m += 9
 
     block_cells = set()
-    top_left_squares = [0,3,6,27,30,33,54,57,60]
+    top_left_squares = [0, 3, 6, 27, 30, 33, 54, 57, 60]
     top_left_square = top_left_squares[block]
     for i in range(3):
         for j in range(3):
@@ -102,11 +107,12 @@ def _get_neighbors(square: int) -> list[int]:
     to_ret = list(all_cells)
     return to_ret
 
+
 def _get_row_col_block(square: int) -> tuple[int, int ,int]:
     """Returns the row of square, column of square, and the number of the Sudoku block square belongs to"""
     row: int = square // 9
-    col: int = square %  9
-    block: int = None
+    col: int = square % 9
+    block: int = -1
     if row < 3 and col < 3:
         block = 0
     elif row < 3 and col < 6:
@@ -125,17 +131,18 @@ def _get_row_col_block(square: int) -> tuple[int, int ,int]:
         block = 7
     else:
         block = 8
-    return (row, col, block)
+    return row, col, block
+
 
 def print_board(board: list[list[int]]):
     board_rep: str = ""
     count = 0
     for i in range(9):
         for j in range(9):
-            to_print: str = board[count][0]
+            to_print: str = str(board[count][0])
             if len(board[count]) > 1:
-                to_print = 0
-            board_rep += str(to_print) + " "
+                to_print = "0"
+            board_rep += to_print + " "
             if j == 2 or j == 5:
                 board_rep += "| "
             count += 1
