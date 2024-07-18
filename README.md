@@ -1,7 +1,7 @@
 # What is this?
 ___
 
-This is a Python implementation of a backtracking seach-based Sudoku-solving algorithm. It takes CSV files as inputs and prints out the solved board.
+This is a Python implementation of a backtracking seach-based Sudoku-solving algorithm. It takes CSV files as inputs and prints out the solved board. All three included boards are drawn from http://sudoku.cba.si/en/ .
 
 # How do I use this?
 ___
