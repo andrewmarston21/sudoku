@@ -12,7 +12,7 @@ if __name__ == "__main__":
     print_board(board)
     print("\n")
     solved_board: list[list[int]] = backtrack_solver(board, verbose=verbosity)
-    if solved_board == None: 
+    if solved_board is None:
         print("Failed to solve the board")
     else:
         print("The solved board:")

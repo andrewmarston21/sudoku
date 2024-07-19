@@ -1,17 +1,19 @@
 import copy
 
 
-def backtrack_solver(board: list[list[int]], square: int=0, verbose=False) -> list[list[int]] | None:
+def backtrack_solver(board: list[list[int]], square: int = 0, verbose=False) -> list[list[int]] | None:
     """Accepts a representation of a given Sudoku board in memory (a list with indices 0 to 80 of the possible values
       of each of the squares)
       and the current square being solved;
       returns a solved board using basic backtracking search or None if every value in square's domain has been tried"""
 
-    if verbose: print(f"backtrack_solver is now running on square number {square}")
-    if verbose: print(board[square]) # print square's domain
+    if verbose: print(f"\nbacktrack_solver is now running on square number {square}")
 
     # If square=81, return the board
-    if square == 81: return board
+    if square == 81:
+        return board
+
+    if verbose: print(str(board[square]) + "\n")  # print square's domain
 
     # Pick the first available value in square's domain
     for value in board[square]:
@@ -19,7 +21,7 @@ def backtrack_solver(board: list[list[int]], square: int=0, verbose=False) -> li
         new_board: list[list[int]] = copy.deepcopy(board)
         new_board[square] = [value]
 
-        if verbose: print("Trying value " + str(value))
+        if verbose: print("Trying value " + str(value) + " for square number " + str(square))
         if verbose: print_board(new_board)
 
         # Check the neighbors of square to make sure this assignment is consistent,
@@ -32,14 +34,11 @@ def backtrack_solver(board: list[list[int]], square: int=0, verbose=False) -> li
         #     continue
 
         # Pass that new board to backtrack_solver to check the next square
-        result = backtrack_solver(new_board, square+1, verbose)
+        result = backtrack_solver(new_board, square + 1, verbose)
 
-        # If the recursive call returns a board, return that board
-        if type(result) is not None:
-            return result
-        
-        # Else the recursive call returns None, try the next value in square's domain.
-        continue
+        if result is None:
+            continue
+        return result
 
     # If all values of square's domain have been tried, return None
     if verbose: print(f"Backtracking to square number {square - 1}")
@@ -49,10 +48,12 @@ def backtrack_solver(board: list[list[int]], square: int=0, verbose=False) -> li
 def _is_consistent(board: list[list[int]], square: int, value: int, verbose: bool) -> bool:
     """Checks if the given board follows the rules of Sudoku, and returns whether it is or not"""
     for loc in _get_neighbors(square):
-        if (len(board[loc]) == 1)\
-             and (board[loc][0] == value)\
-                 and (loc != square):
-            if verbose: print("There is a " + str(board[loc][0]) + " in square " + str(loc) + " that conflicts with the " + str(value) + " in square " + str(square))
+        if (len(board[loc]) == 1) \
+                and (board[loc][0] == value) \
+                and (loc != square):
+            if verbose:
+                print("There is a " + str(board[loc][0]) + " in square " + str(loc) +
+                      " that conflicts with the " + str(value) + " in square " + str(square) + "\n")
             return False
     return True
 
@@ -69,13 +70,13 @@ def _forward_check(board: list[list[int]], square: int, value: int) -> bool:
 
         # if the assigned value is in the domain of any neighbor, remove it ***this is the core of forward checking***
         if value in board_copy[neighbor]: board_copy[neighbor].remove(value)
-    
+
         # If the domain of any square is empty, then this value assignment cannot work
         if len(board_copy[neighbor]) == 0:
             return False
-    
+
     # If all checks pass, then this value might work
-    board = copy.deepcopy(board_copy) # some fun deliberate side effects that might be causing the failures
+    board = copy.deepcopy(board_copy)  # some fun deliberate side effects that might be causing the failures
     return True
 
 
@@ -88,8 +89,8 @@ def _get_neighbors(square: int) -> list[int]:
 
     row_cells = set()
     for i in range(9):
-        row_cells.add(row*9 + i)
-    
+        row_cells.add(row * 9 + i)
+
     col_cells = set()
     m = col
     while m < 81:
@@ -101,14 +102,14 @@ def _get_neighbors(square: int) -> list[int]:
     top_left_square = top_left_squares[block]
     for i in range(3):
         for j in range(3):
-            block_cells.add(top_left_square+i+(9*j))
-    
+            block_cells.add(top_left_square + i + (9 * j))
+
     all_cells = row_cells.union(col_cells).union(block_cells)
     to_ret = list(all_cells)
     return to_ret
 
 
-def _get_row_col_block(square: int) -> tuple[int, int ,int]:
+def _get_row_col_block(square: int) -> tuple[int, int, int]:
     """Returns the row of square, column of square, and the number of the Sudoku block square belongs to"""
     row: int = square // 9
     col: int = square % 9
@@ -149,4 +150,5 @@ def print_board(board: list[list[int]]):
         board_rep += "\n"
         if i == 2 or i == 5:
             board_rep += "---------------------\n"
+    board_rep = board_rep.strip()
     print(board_rep)
