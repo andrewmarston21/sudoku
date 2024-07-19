@@ -29,9 +29,9 @@ def backtrack_solver(board: list[list[int]], square: int = 0, verbose=False) -> 
         if not _is_consistent(board, square, value, verbose):
             continue
 
-        # # use forward checking to determine if this value is viable in the longer term
-        # if not _forward_check(new_board, square, value):
-        #     continue
+        # use forward checking to determine if this value is viable in the longer term
+        if not _forward_check(new_board, square, value):
+            continue
 
         # Pass that new board to backtrack_solver to check the next square
         result = backtrack_solver(new_board, square + 1, verbose)
