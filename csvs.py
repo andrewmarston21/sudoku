@@ -1,5 +1,6 @@
 import csv
 
+
 def read_csv(path: str) -> list[list[int]]:
     board: list[list[int]] = []
     with open(path) as csv_file:

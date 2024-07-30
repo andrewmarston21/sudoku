@@ -3,6 +3,7 @@ from time import time
 
 from backtrack import backtrack_solver, print_board
 from csvs import read_csv
+from gui import draw
 
 if __name__ == "__main__":
     """handles inputting a board and outputting a representation of that board solved"""
@@ -23,3 +24,4 @@ if __name__ == "__main__":
         print("The solved board:")
         print_board(solved_board)
     print("The program took " + str(elapsed_time) + " seconds to run")
+    draw(solved_board, elapsed_time)
